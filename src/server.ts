@@ -2,9 +2,9 @@ import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
 import { routes } from './routes';
+dotenv.config();
 
 const app: Application = express();
-dotenv.config();
 
 app.use(express.json());
 

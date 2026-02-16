@@ -54,6 +54,14 @@ router.post(
   controller.createQuestion
 );
 
+// Atualizar pergunta
+router.patch(
+  '/:quizId/questions/:questionId',
+  ensureAuthenticated,
+  ensureRole('PROFESSOR'),
+  controller.updateQuestion
+);
+
 // Listar perguntas do quiz
 router.get(
   '/:quizId/questions',

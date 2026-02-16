@@ -43,6 +43,15 @@ export class UsersRepository {
     return rows[0];
   }
 
+    async findById(id: string): Promise<User | undefined> {
+    const { rows } = await pool.query(
+      'SELECT * FROM users WHERE id = $1',
+      [id]
+    );
+
+    return rows[0];
+  }
+
   async findAll(): Promise<User[]> {
     const { rows } = await pool.query(
       'SELECT id, name, email, role, created_at FROM users'

@@ -6,10 +6,12 @@ const usersRoutes = Router();
 const controller = new UsersController();
 const authController = new AuthController();
 
-usersRoutes.post('/', controller.create);
-usersRoutes.get('/', controller.list);
-
 //LOGIN
 usersRoutes.post('/login', authController.login);
+
+usersRoutes.post('/', controller.create);
+usersRoutes.get('/', controller.list);
+usersRoutes.get('/:id', controller.getById);
+
 
 export { usersRoutes };

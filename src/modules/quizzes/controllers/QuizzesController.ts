@@ -12,6 +12,7 @@ import { QuestionsRepository } from '../repositories/QuestionsRepository';
 import { AlternativesRepository } from '../repositories/AlternativesRepository';
 import { QuizParticipantsRepository } from '../repositories/QuizParticipantsRepository';
 import { AnswersRepository } from '../repositories/AnswersRepository';
+import { UpdateQuestionService } from '../services/UpdateQuestionService';
 
 export class QuizzesController {
 
@@ -57,7 +58,7 @@ export class QuizzesController {
     const quizzesRepository = new QuizzesRepository();
     await quizzesRepository.updateStatus(quizId as string, isActive);
 
-    return res.status(204).send();
+    return res.status(200).send();
   }
 
   async createQuestion(req: Request, res: Response) {
@@ -83,6 +84,32 @@ export class QuizzesController {
     });
 
     return res.status(201).json(question);
+  }
+
+  async updateQuestion(req: Request, res: Response) {
+    const { quizId, questionId } = req.params;
+    const { statement, points, penalty, alternatives } = req.body;
+
+    const quizzesRepository = new QuizzesRepository();
+    const questionsRepository = new QuestionsRepository();
+    const alternativesRepository = new AlternativesRepository();
+
+    const service = new UpdateQuestionService(
+      quizzesRepository,
+      questionsRepository,
+      alternativesRepository
+    );
+
+    const question = await service.execute({
+      quizId: quizId as string,
+      questionId: questionId as string,
+      statement,
+      points,
+      penalty,
+      alternatives
+    });
+
+    return res.status(200).json(question);
   }
 
   async listQuestions(req: Request, res: Response) {

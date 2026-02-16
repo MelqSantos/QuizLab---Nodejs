@@ -27,4 +27,12 @@ export class UsersController {
 
     return res.json(users);
   }
+
+  async getById(req: Request, res: Response) {
+    const { id } = req.params;
+    const service = new ListUsersService();
+    const user = await service.getById(id as string);
+
+    return res.json(user);
+  }
 }

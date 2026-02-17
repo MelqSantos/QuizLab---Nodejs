@@ -74,13 +74,17 @@ export class AlternativesRepository {
     const textColumn = await this.resolveTextColumn();
     const result = await pool.query(
       `
-      SELECT id, ${textColumn} AS text
+      SELECT id, ${textColumn} AS text, is_correct
       FROM alternatives
       WHERE question_id = $1
       `,
       [questionId]
     );
 
-    return result.rows;
+    return result.rows.map((r: any) => ({
+      id: r.id,
+      text: r.text,
+      is_correct: r.is_correct
+    }));
   }
 }

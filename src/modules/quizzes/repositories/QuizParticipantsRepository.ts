@@ -5,7 +5,7 @@ export class QuizParticipantsRepository {
   async create(quizId: string, userId: string) {
     await pool.query(
       `
-      INSERT INTO quiz_participants (quiz_id, user_id, score)
+      INSERT INTO quiz_participants (quiz_id, user_id, total_score)
       VALUES ($1, $2, 0)
       `,
       [quizId, userId]
@@ -21,7 +21,6 @@ export class QuizParticipantsRepository {
       `,
       [quizId, userId]
     );
-
     return result.rows[0];
   }
 
@@ -33,7 +32,7 @@ export class QuizParticipantsRepository {
     await pool.query(
       `
       UPDATE quiz_participants
-      SET score = score + $1
+      SET total_score = total_score + $1
       WHERE quiz_id = $2 AND user_id = $3
       `,
       [scoreChange, quizId, userId]
@@ -43,11 +42,11 @@ export class QuizParticipantsRepository {
   async getRanking(quizId: string) {
     const result = await pool.query(
       `
-      SELECT u.id, u.name, qp.score
+      SELECT u.id, u.name, u.email, qp.total_score
       FROM quiz_participants qp
       JOIN users u ON u.id = qp.user_id
       WHERE qp.quiz_id = $1
-      ORDER BY qp.score DESC
+      ORDER BY qp.total_score DESC
       `,
       [quizId]
     );

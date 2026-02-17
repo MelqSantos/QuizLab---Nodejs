@@ -1,25 +1,29 @@
 import { pool } from '../../../config/database';
 
 interface ICreateAnswerDTO {
+  quizId: string;
   questionId: string;
   userId: string;
   alternativeId: string;
+  isCorrect: boolean;
 }
 
 export class AnswersRepository {
 
   async create({
+    quizId,
     questionId,
     userId,
-    alternativeId
+    alternativeId,
+    isCorrect
   }: ICreateAnswerDTO) {
 
     await pool.query(
       `
-      INSERT INTO answers (question_id, user_id, alternative_id)
-      VALUES ($1, $2, $3)
+      INSERT INTO answers (quiz_id, question_id, user_id, alternative_id, is_correct)
+      VALUES ($1, $2, $3, $4, $5)
       `,
-      [questionId, userId, alternativeId]
+      [quizId, questionId, userId, alternativeId, isCorrect]
     );
   }
 

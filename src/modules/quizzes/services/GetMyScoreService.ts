@@ -15,7 +15,7 @@ export class GetMyScoreService {
     }
 
     return {
-      score: participant.score
+      score: participant.total_score
     };
   }
 }

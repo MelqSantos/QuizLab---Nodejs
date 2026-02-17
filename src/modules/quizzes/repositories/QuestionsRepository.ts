@@ -1,4 +1,5 @@
 import { pool } from '../../../config/database';
+import { AlternativesRepository } from './AlternativesRepository';
 
 interface ICreateQuestionDTO {
   quizId: string;
@@ -52,7 +53,17 @@ export class QuestionsRepository {
       [quizId]
     );
 
-    return result.rows;
+    const questions = result.rows;
+    const alternativesRepo = new AlternativesRepository();
+
+    const questionsWithAlternatives = await Promise.all(
+      questions.map(async (q: any) => {
+        const alts = await alternativesRepo.listByQuestion(q.id);
+        return { ...q, alternatives: alts };
+      })
+    );
+
+    return questionsWithAlternatives;
   }
 
   async updateWithClient(client: any, id: string, statement: string, points: number, penalty: number) {

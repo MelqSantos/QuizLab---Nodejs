@@ -42,9 +42,11 @@ export class SubmitAnswerService {
       : -question.penalty;
 
     await this.answersRepository.create({
+      quizId,
       questionId,
       userId,
-      alternativeId
+      alternativeId,
+      isCorrect: alternative.is_correct
     });
 
     await this.participantsRepository.updateScore(

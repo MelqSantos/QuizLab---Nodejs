@@ -51,11 +51,12 @@ export class QuizParticipantsRepository {
   async getRanking(quizId: string) {
     const result = await pool.query(
       `
-      SELECT u.id, u.name, u.email, qp.total_score
+      SELECT u.name as aluno, u.email, CONCAT(q.theme, ' - ', q.class_name) as revisao,  qp.total_score
       FROM quiz_participants qp
       JOIN users u ON u.id = qp.user_id
+      join quizzes q on q.id = qp.quiz_id 
       WHERE qp.quiz_id = $1
-      ORDER BY qp.total_score DESC
+	    order by qp.total_score desc;
       `,
       [quizId]
     );

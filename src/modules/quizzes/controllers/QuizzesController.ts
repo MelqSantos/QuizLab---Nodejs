@@ -13,6 +13,8 @@ import { AlternativesRepository } from '../repositories/AlternativesRepository';
 import { QuizParticipantsRepository } from '../repositories/QuizParticipantsRepository';
 import { AnswersRepository } from '../repositories/AnswersRepository';
 import { UpdateQuestionService } from '../services/UpdateQuestionService';
+import { ReplaceAllQuestionsService } from '../services/ReplaceAllQuestionsService';
+import { SubmitBulkAnswersService } from '../services/SubmitBulkAnswersService';
 
 export class QuizzesController {
 
@@ -112,6 +114,29 @@ export class QuizzesController {
     return res.status(200).json(question);
   }
 
+  async updateAllQuestions(req: Request, res: Response) {
+    const { quizId } = req.params;
+    const { questions } = req.body;
+
+    const quizzesRepository = new QuizzesRepository();
+    const questionsRepository = new QuestionsRepository();
+    const alternativesRepository = new AlternativesRepository();
+
+
+    const service = new ReplaceAllQuestionsService(
+      quizzesRepository,
+      questionsRepository,
+      alternativesRepository
+    );
+
+    const created = await service.execute({
+      quizId: quizId as string,
+      questions
+    });
+
+    return res.status(200).json(created);
+  }
+
   async listQuestions(req: Request, res: Response) {
     const { quizId } = req.params;
 
@@ -176,6 +201,31 @@ export class QuizzesController {
       alternativeId,
       req.user.id
     );
+
+    return res.json(result);
+  }
+
+  async answerQuestionsInBulk(req: any, res: Response) {
+    const { quizId } = req.params;
+    const { answers } = req.body;
+
+    const answersRepository = new AnswersRepository();
+    const questionsRepository = new QuestionsRepository();
+    const alternativesRepository = new AlternativesRepository();
+    const participantsRepository = new QuizParticipantsRepository();
+
+    const service = new SubmitBulkAnswersService(
+      answersRepository,
+      questionsRepository,
+      alternativesRepository,
+      participantsRepository
+    );
+
+    const result = await service.execute({
+      quizId: quizId as string,
+      answers,
+      userId: req.user.id
+    });
 
     return res.json(result);
   }

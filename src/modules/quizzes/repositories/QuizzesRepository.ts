@@ -30,7 +30,10 @@ export class QuizzesRepository {
 
   async findAll() {
     const result = await pool.query(
-      `SELECT * FROM quizzes`
+      `SELECT u.id, u.name as author, q.id, q.title, q.class_name, q.theme, q.created_by, q.is_active, q.created_at 
+      FROM quizzes q
+      JOIN users u ON u.id = q.created_by
+      WHERE q.created_by = u.id`
     );
 
     return result.rows;

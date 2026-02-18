@@ -22,7 +22,6 @@ router.post(
 router.get(
   '/',
   ensureAuthenticated,
-  ensureRole('PROFESSOR'),
   controller.listQuizzes
 );
 
@@ -62,6 +61,14 @@ router.patch(
   controller.updateQuestion
 );
 
+// Atualizar todas perguntas do quiz (substitui todas)
+router.patch(
+  '/:quizId/questions',
+  ensureAuthenticated,
+  ensureRole('PROFESSOR'),
+  controller.updateAllQuestions
+);
+
 // Listar perguntas do quiz
 router.get(
   '/:quizId/questions',
@@ -99,6 +106,14 @@ router.post(
   ensureAuthenticated,
   ensureRole('ALUNO'),
   controller.answerQuestion
+);
+
+// Responder múltiplas perguntas em lote
+router.post(
+  '/:quizId/answers',
+  ensureAuthenticated,
+  ensureRole('ALUNO'),
+  controller.answerQuestionsInBulk
 );
 
 /* ====================================

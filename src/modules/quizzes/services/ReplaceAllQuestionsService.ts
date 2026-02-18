@@ -8,35 +8,29 @@ interface IAlternative {
   is_correct: boolean;
 }
 
-interface IRequest {
-  quizId: string;
-  questionId: string;
+interface IQuestionDTO {
   statement: string;
   points: number;
   penalty: number;
   alternatives: IAlternative[];
 }
 
-export class UpdateQuestionService {
+interface IRequest {
+  quizId: string;
+  questions: IQuestionDTO[];
+}
+
+export class ReplaceAllQuestionsService {
   constructor(
     private quizzesRepository: QuizzesRepository,
     private questionsRepository: QuestionsRepository,
     private alternativesRepository: AlternativesRepository
   ) {}
 
-  async execute({ quizId, questionId, statement, points, penalty, alternatives }: IRequest) {
+  async execute({ quizId, questions }: IRequest) {
     const quiz = await this.quizzesRepository.findById(quizId);
     if (!quiz) {
       throw new Error('Quiz não encontrado');
-    }
-
-    const question = await this.questionsRepository.findById(questionId);
-    if (!question) {
-      throw new Error('Pergunta não encontrada');
-    }
-
-    if (question.quiz_id && question.quiz_id !== quizId) {
-      throw new Error('Pergunta não pertence a esse quiz');
     }
 
     const client = await pool.connect();
@@ -44,23 +38,31 @@ export class UpdateQuestionService {
     try {
       await client.query('BEGIN');
 
-      const updatedQuestion = await this.questionsRepository.updateWithClient(
-        client,
-        questionId,
-        statement,
-        points,
-        penalty
-      );
+      // remove existing alternatives and questions for this quiz
+      await this.questionsRepository.deleteByQuizWithClient(client, quizId);
 
-      await this.alternativesRepository.deleteByQuestionWithClient(client, questionId);
+      const createdQuestions: any[] = [];
 
-      if (alternatives && alternatives.length > 0) {
-        await this.alternativesRepository.createManyWithClient(client, questionId, alternatives);
+      // create new questions and alternatives
+      for (const q of questions) {
+        const createdQ = await this.questionsRepository.createWithClient(
+          client,
+          quizId,
+          q.statement,
+          q.points,
+          q.penalty
+        );
+
+        if (q.alternatives && q.alternatives.length > 0) {
+          await this.alternativesRepository.createManyWithClient(client, createdQ.id, q.alternatives);
+        }
+
+        createdQuestions.push({ ...createdQ, alternatives: q.alternatives || [] });
       }
 
       await client.query('COMMIT');
 
-      return updatedQuestion;
+      return createdQuestions;
     } catch (err) {
       await client.query('ROLLBACK');
       throw err;

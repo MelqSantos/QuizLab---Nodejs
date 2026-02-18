@@ -5,7 +5,7 @@ interface ICreateAnswerDTO {
   questionId: string;
   userId: string;
   alternativeId: string;
-  isCorrect: boolean;
+  is_correct: boolean;
 }
 
 export class AnswersRepository {
@@ -15,7 +15,7 @@ export class AnswersRepository {
     questionId,
     userId,
     alternativeId,
-    isCorrect
+    is_correct
   }: ICreateAnswerDTO) {
 
     await pool.query(
@@ -23,7 +23,7 @@ export class AnswersRepository {
       INSERT INTO answers (quiz_id, question_id, user_id, alternative_id, is_correct)
       VALUES ($1, $2, $3, $4, $5)
       `,
-      [quizId, questionId, userId, alternativeId, isCorrect]
+      [quizId, questionId, userId, alternativeId, is_correct]
     );
   }
 

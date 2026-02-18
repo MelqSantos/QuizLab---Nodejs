@@ -46,7 +46,7 @@ export class SubmitAnswerService {
       questionId,
       userId,
       alternativeId,
-      isCorrect: alternative.is_correct
+      is_correct: alternative.is_correct
     });
 
     await this.participantsRepository.updateScore(

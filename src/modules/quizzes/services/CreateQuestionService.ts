@@ -4,7 +4,7 @@ import { QuizzesRepository } from '../repositories/QuizzesRepository';
 
 interface IAlternative {
   text: string;
-  isCorrect: boolean;
+  is_correct: boolean;
 }
 
 interface IRequest {
@@ -35,7 +35,7 @@ export class CreateQuestionService {
       throw new Error('Quiz não encontrado');
     }
 
-    const hasCorrect = alternatives.some(a => a.isCorrect);
+    const hasCorrect = alternatives.some(a => a.is_correct);
     if (!hasCorrect) {
       throw new Error('Deve haver ao menos uma alternativa correta');
     }

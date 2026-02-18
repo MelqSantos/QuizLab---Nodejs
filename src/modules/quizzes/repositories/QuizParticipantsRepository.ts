@@ -29,6 +29,15 @@ export class QuizParticipantsRepository {
     userId: string,
     scoreChange: number
   ) {
+    // First, check if participant exists
+    const participant = await this.findByQuizAndUser(quizId, userId);
+    
+    if (!participant) {
+      // Create participant if doesn't exist
+      await this.create(quizId, userId);
+    }
+
+    // Now update the score
     await pool.query(
       `
       UPDATE quiz_participants

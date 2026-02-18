@@ -96,6 +96,31 @@ export class QuestionsRepository {
     return result.rows[0];
   }
 
+  async createWithClient(client: any, quizId: string, statement: string, points: number, penalty: number) {
+    const result = await client.query(
+      `
+      INSERT INTO questions (quiz_id, statement, points, penalty)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+      `,
+      [quizId, statement, points, penalty]
+    );
+
+    return result.rows[0];
+  }
+
+  async deleteByQuizWithClient(client: any, quizId: string) {
+    await client.query(
+      `DELETE FROM alternatives WHERE question_id IN (SELECT id FROM questions WHERE quiz_id = $1)`,
+      [quizId]
+    );
+
+    await client.query(
+      `DELETE FROM questions WHERE quiz_id = $1`,
+      [quizId]
+    );
+  }
+
   private async hasUpdatedAtColumn(): Promise<boolean> {
     const result = await pool.query(
       `

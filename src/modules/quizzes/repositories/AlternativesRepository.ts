@@ -2,13 +2,13 @@ import { pool } from '../../../config/database';
 
 interface IAlternative {
   text: string;
-  isCorrect: boolean;
+  is_correct: boolean;
 }
 
 export class AlternativesRepository {
 
   private async resolveTextColumn(): Promise<string> {
-    const candidates = ['text', 'content', 'description', 'label', 'title'];
+    const candidates = ['description', 'text', 'content', 'label', 'title'];
     const result = await pool.query(
       `
       SELECT column_name
@@ -30,7 +30,7 @@ export class AlternativesRepository {
 
     for (const alt of alternatives) {
       const query = `INSERT INTO alternatives (question_id, ${textColumn}, is_correct) VALUES ($1, $2, $3)`;
-      await pool.query(query, [questionId, alt.text, alt.isCorrect]);
+      await pool.query(query, [questionId, alt.text, alt.is_correct]);
     }
   }
 
@@ -49,7 +49,7 @@ export class AlternativesRepository {
 
     for (const alt of alternatives) {
       const query = `INSERT INTO alternatives (question_id, ${textColumn}, is_correct) VALUES ($1, $2, $3)`;
-      await client.query(query, [questionId, alt.text, alt.isCorrect]);
+      await client.query(query, [questionId, alt.text, alt.is_correct]);
     }
   }
 
